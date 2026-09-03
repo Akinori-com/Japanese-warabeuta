@@ -1,0 +1,1209 @@
+/* ==========================================================================
+   くまさんくまさん まねっこ＆ことばあそび アプリスタイルシート
+   特別支援教育（UD）配慮：大画面視認性、大きなタップエリア、親しみやすい色使い
+   ========================================================================== */
+
+:root {
+  --bg-main: #FFF9E6;           /* やさしいクリームイエロー（刺激を抑えた背景） */
+  --bg-card: #FFFFFF;
+  --text-main: #2D241E;         /* 濃いこげ茶色（黒よりもコントラストがきつくなく読みやすい） */
+  --text-highlight: #C2410C;    /* アクションの強調文字色（あたたかいオレンジ赤） */
+  --border-color: #E2D9C8;
+  --primary-color: #E65100;     /* 活気のあるオレンジ */
+  --primary-hover: #BF360C;
+  --secondary-color: #0288D1;   /* すっきりしたブルー */
+  --secondary-hover: #01579B;
+  --accent-green: #2E7D32;      /* やさしいグリーン */
+  --accent-yellow: #FFF176;
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 32px;
+  --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-lg: 0 16px 40px rgba(0, 0, 0, 0.16);
+  --font-family: "BIZ UDPGothic", "Hiragino Maru Gothic ProN", "Yu Gothic", "Meiryo", sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* --------------------------------------------------------------------------
+   アプリ全体レイアウト
+   -------------------------------------------------------------------------- */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  max-width: 1600px;
+  margin: 0 auto;
+  width: 100%;
+  padding: 16px 24px;
+}
+
+/* --------------------------------------------------------------------------
+   ヘッダー
+   -------------------------------------------------------------------------- */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-card);
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  border: 2px solid var(--border-color);
+  margin-bottom: 16px;
+  flex-shrink: 0;
+}
+
+.app-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 1.6rem;
+  font-weight: bold;
+  color: var(--text-main);
+}
+
+.title-icon {
+  font-size: 2rem;
+  animation: bounce-icon 2s infinite ease-in-out;
+}
+
+@keyframes bounce-icon {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+.header-right {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* ボタン共通設計（大画面・タップしやすい高めのハイト） */
+button {
+  font-family: inherit;
+  font-weight: bold;
+  cursor: pointer;
+  border: none;
+  outline: none;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+button:active {
+  transform: scale(0.96);
+}
+
+.btn-icon {
+  background: #F1E9DB;
+  color: var(--text-main);
+  padding: 10px 18px;
+  font-size: 1.1rem;
+  border: 2px solid #D5C9B3;
+}
+
+.btn-icon:hover {
+  background: #E5DAC7;
+}
+
+.btn-primary {
+  background: var(--primary-color);
+  color: #FFF;
+  padding: 10px 20px;
+  font-size: 1.15rem;
+  box-shadow: 0 4px 10px rgba(230, 81, 0, 0.3);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+.btn-secondary {
+  background: var(--secondary-color);
+  color: #FFF;
+  padding: 10px 20px;
+  font-size: 1.15rem;
+  box-shadow: 0 4px 10px rgba(2, 136, 209, 0.3);
+}
+
+.btn-secondary:hover {
+  background: var(--secondary-hover);
+}
+
+/* --------------------------------------------------------------------------
+   ステージ（メインエリア）
+   -------------------------------------------------------------------------- */
+.stage-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  border: 4px solid #E8DFD0;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  justify-content: space-between;
+}
+
+/* 歌詞表示セクション（大文字・遠くからでも見やすい） */
+.lyrics-section {
+  text-align: center;
+  flex-shrink: 0;
+  padding-bottom: 8px;
+}
+
+.lyrics-prefix {
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  color: #6D5C50;
+  margin-bottom: 4px;
+}
+
+.lyrics-main {
+  min-height: 5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-text {
+  display: inline-block;
+  font-size: 4rem;
+  font-weight: 900;
+  letter-spacing: 0.18em;
+  color: var(--text-highlight);
+  background: linear-gradient(180deg, #FFF6D5 0%, #FFE082 100%);
+  padding: 8px 36px;
+  border-radius: var(--radius-lg);
+  border: 4px dashed #FFA000;
+  box-shadow: 0 6px 16px rgba(255, 160, 0, 0.25);
+  animation: pop-text 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes pop-text {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* キャラクター（くまさん）ステージ */
+.character-section {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-height: 280px;
+}
+
+.character-stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 10px;
+}
+
+.bear-wrapper {
+  width: 320px;
+  height: 320px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 12px 16px rgba(0, 0, 0, 0.15));
+  transition: transform 0.2s ease;
+  perspective: 1000px;
+}
+
+.bear-wrapper:hover {
+  transform: scale(1.03);
+}
+
+.custom-card-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  border-radius: var(--radius-md);
+}
+
+/* ふきだし */
+.speech-bubble {
+  position: absolute;
+  top: -20px;
+  right: -40px;
+  background: #FFF;
+  border: 3px solid var(--primary-color);
+  padding: 12px 20px;
+  border-radius: 24px;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary-hover);
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+  animation: bubble-float 2.5s infinite ease-in-out;
+  pointer-events: none;
+}
+
+.speech-bubble::before {
+  content: "";
+  position: absolute;
+  bottom: -14px;
+  left: 30px;
+  border-width: 14px 12px 0;
+  border-style: solid;
+  border-color: var(--primary-color) transparent;
+  display: block;
+  width: 0;
+}
+
+.speech-bubble::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: 32px;
+  border-width: 11px 10px 0;
+  border-style: solid;
+  border-color: #FFF transparent;
+  display: block;
+  width: 0;
+}
+
+@keyframes bubble-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* --------------------------------------------------------------------------
+   コントロールバー（前へ／次へ、インジケーター）
+   -------------------------------------------------------------------------- */
+.stage-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 2px dashed #E0D6C3;
+  flex-shrink: 0;
+}
+
+.nav-button {
+  padding: 18px 36px;
+  font-size: 1.8rem;
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  min-width: 180px;
+}
+
+.btn-prev {
+  background: #E2E8F0;
+  color: #334155;
+  border: 3px solid #CBD5E1;
+}
+
+.btn-prev:hover {
+  background: #CBD5E1;
+}
+
+.btn-next {
+  background: #16A34A;
+  color: #FFF;
+  border: 3px solid #15803D;
+  box-shadow: 0 6px 16px rgba(22, 163, 74, 0.35);
+}
+
+.btn-next:hover {
+  background: #15803D;
+}
+
+.nav-arrow {
+  font-size: 2rem;
+}
+
+.progress-indicator {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-counter {
+  font-size: 2rem;
+  font-weight: 900;
+  color: #5C4E43;
+  background: #F5EBE1;
+  padding: 6px 28px;
+  border-radius: 30px;
+  letter-spacing: 0.1em;
+}
+
+/* 自動送りスイッチ */
+.auto-play-toggle {
+  display: flex;
+  align-items: center;
+}
+
+.switch-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: #6B7280;
+}
+
+.switch-label input {
+  display: none;
+}
+
+.switch-slider {
+  width: 48px;
+  height: 26px;
+  background-color: #D1D5DB;
+  border-radius: 20px;
+  position: relative;
+  transition: background-color 0.2s;
+}
+
+.switch-slider::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: white;
+  transition: transform 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.switch-label input:checked + .switch-slider {
+  background-color: var(--accent-green);
+}
+
+.switch-label input:checked + .switch-slider::after {
+  transform: translateX(22px);
+}
+
+/* --------------------------------------------------------------------------
+   くまさんSVG＆動作アニメーション
+   -------------------------------------------------------------------------- */
+.bear-svg {
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* ① まわれみぎ（身体の垂直軸を中心にした「回れ右」水平ターン） */
+.anim-maware {
+  animation: anim-maware-turn 3s ease-in-out infinite;
+  transform-origin: 50% 50%;
+  transform-style: preserve-3d;
+}
+
+@keyframes anim-maware-turn {
+  0%, 15% {
+    /* 前を向いてピシッと立つ */
+    transform: rotateY(0deg) translateY(0);
+  }
+  30% {
+    /* 右足・腰を軸に右へ90度ターン（真横） */
+    transform: rotateY(-90deg) translateY(-6px);
+  }
+  45%, 65% {
+    /* 完全に後ろを向く（180度ターン完了） */
+    transform: rotateY(-180deg) translateY(0);
+  }
+  80% {
+    /* 再び右から回って横を向く（270度） */
+    transform: rotateY(-270deg) translateY(-6px);
+  }
+  95%, 100% {
+    /* 正面に戻る（360度完了） */
+    transform: rotateY(-360deg) translateY(0);
+  }
+}
+
+/* 回れ右の表裏（正面と後ろ姿）のリアルタイム切り替え */
+.anim-maware .bear-front-group {
+  animation: anim-front-toggle 3s infinite;
+}
+.anim-maware .bear-back-group {
+  animation: anim-back-toggle 3s infinite;
+}
+
+@keyframes anim-front-toggle {
+  0%, 28% { opacity: 1; visibility: visible; }
+  29%, 76% { opacity: 0; visibility: hidden; }
+  77%, 100% { opacity: 1; visibility: visible; }
+}
+
+@keyframes anim-back-toggle {
+  0%, 28% { opacity: 0; visibility: hidden; }
+  29%, 76% { opacity: 1; visibility: visible; }
+  77%, 100% { opacity: 0; visibility: hidden; }
+}
+
+/* ② りょうてをついて（前屈みになって両手を下につく） */
+.anim-ryoute {
+  animation: anim-bow 2s ease-in-out infinite;
+  transform-origin: 50% 85%;
+}
+
+@keyframes anim-bow {
+  0%, 100% { transform: translateY(0) scaleY(1); }
+  40%, 60% { transform: translateY(40px) scaleY(0.85); }
+}
+
+/* ③ かたあしあげて（片足をあげてバランスをとる） */
+.anim-kataashi {
+  animation: anim-balance 1.8s ease-in-out infinite alternate;
+  transform-origin: 40% 90%;
+}
+
+@keyframes anim-balance {
+  0% { transform: rotate(-8deg) translateY(-10px); }
+  100% { transform: rotate(8deg) translateY(0); }
+}
+
+/* ④ さようなら（バイバイと手を振る） */
+.anim-sayounara .bear-arm-right {
+  animation: anim-wave 0.8s ease-in-out infinite alternate;
+  transform-origin: 220px 180px;
+}
+
+@keyframes anim-wave {
+  0% { transform: rotate(-25deg); }
+  100% { transform: rotate(35deg); }
+}
+
+/* ⑤ ジャンプ（高く跳ねる） */
+.anim-jump {
+  animation: anim-jumping 1.2s cubic-bezier(0.28, 0.84, 0.42, 1) infinite;
+  transform-origin: 50% 90%;
+}
+
+@keyframes anim-jumping {
+  0%, 100% { transform: translateY(0) scale(1, 1); }
+  25% { transform: translateY(15px) scale(1.15, 0.85); } /* しゃがむ */
+  50% { transform: translateY(-70px) scale(0.9, 1.15); } /* 跳ぶ */
+  75% { transform: translateY(0) scale(1.1, 0.9); }     /* 着地 */
+}
+
+/* ⑥ てをたたいて（拍手） */
+.anim-clap .bear-arm-left {
+  animation: anim-clap-left 0.6s ease-in-out infinite alternate;
+  transform-origin: 100px 190px;
+}
+.anim-clap .bear-arm-right {
+  animation: anim-clap-right 0.6s ease-in-out infinite alternate;
+  transform-origin: 220px 190px;
+}
+
+@keyframes anim-clap-left {
+  0% { transform: rotate(-25deg); }
+  100% { transform: rotate(15deg); }
+}
+
+@keyframes anim-clap-right {
+  0% { transform: rotate(25deg); }
+  100% { transform: rotate(-15deg); }
+}
+
+/* ⑦ バンザイ（両手を高々と挙げて喜ぶ） */
+.anim-banzai {
+  animation: anim-banzai-bounce 1.2s ease-in-out infinite alternate;
+  transform-origin: 50% 90%;
+}
+.anim-banzai .bear-arm-left {
+  animation: anim-banzai-arm-left 1.2s ease-in-out infinite alternate;
+  transform-origin: 100px 180px;
+}
+.anim-banzai .bear-arm-right {
+  animation: anim-banzai-arm-right 1.2s ease-in-out infinite alternate;
+  transform-origin: 220px 180px;
+}
+
+@keyframes anim-banzai-bounce {
+  0% { transform: translateY(6px); }
+  100% { transform: translateY(-24px); }
+}
+@keyframes anim-banzai-arm-left {
+  0% { transform: scale(0.96) rotate(4deg); }
+  100% { transform: scale(1.06) rotate(-6deg); }
+}
+@keyframes anim-banzai-arm-right {
+  0% { transform: scale(0.96) rotate(-4deg); }
+  100% { transform: scale(1.06) rotate(6deg); }
+}
+
+/* ⑧ あたまポンポン（手が頭のてっぺんに優しくタッチ） */
+.anim-atama .bear-arm-right {
+  animation: anim-pat-head 0.9s ease-in-out infinite alternate;
+  transform-origin: 225px 180px;
+}
+
+@keyframes anim-pat-head {
+  0% { transform: translateY(-16px); }
+  100% { transform: translateY(6px); }
+}
+
+/* ⑨ おしりふりふり */
+.anim-oshiri {
+  animation: anim-wiggle 0.7s ease-in-out infinite alternate;
+  transform-origin: 50% 20%;
+}
+
+@keyframes anim-wiggle {
+  0% { transform: rotate(-15deg) translateX(-15px); }
+  100% { transform: rotate(15deg) translateX(15px); }
+}
+
+/* ⑩ おやすみなさい（目を閉じてゆっくり呼吸） */
+.anim-oyasumi {
+  animation: anim-sleep 3s ease-in-out infinite alternate;
+  transform-origin: 50% 70%;
+}
+
+@keyframes anim-sleep {
+  0% { transform: rotate(12deg) translateY(18px) scale(0.98); }
+  100% { transform: rotate(15deg) translateY(22px) scale(1.02); }
+}
+
+/* ⑪ あしぶみして（その場元気よく足踏み） */
+.anim-ashibumi {
+  animation: anim-march-body 0.6s ease-in-out infinite alternate;
+}
+.anim-ashibumi .bear-leg-left {
+  animation: anim-march-leg 0.6s ease-in-out infinite alternate;
+  transform-origin: 120px 240px;
+}
+.anim-ashibumi .bear-leg-right {
+  animation: anim-march-leg 0.6s ease-in-out infinite alternate-reverse;
+  transform-origin: 200px 240px;
+}
+.anim-ashibumi .bear-arm-left {
+  animation: anim-march-arm 0.6s ease-in-out infinite alternate;
+  transform-origin: 90px 180px;
+}
+.anim-ashibumi .bear-arm-right {
+  animation: anim-march-arm 0.6s ease-in-out infinite alternate-reverse;
+  transform-origin: 230px 180px;
+}
+
+@keyframes anim-march-body {
+  0% { transform: translateY(-6px); }
+  100% { transform: translateY(6px); }
+}
+@keyframes anim-march-leg {
+  0% { transform: translateY(-16px) rotate(-8deg); }
+  100% { transform: translateY(0) rotate(0deg); }
+}
+@keyframes anim-march-arm {
+  0% { transform: rotate(-30deg); }
+  100% { transform: rotate(30deg); }
+}
+
+/* ⑫ しんこきゅう（息を大きく吸って、吐く） */
+.anim-shinkokyu {
+  animation: anim-breathe 4s ease-in-out infinite;
+  transform-origin: 50% 80%;
+}
+.anim-shinkokyu .bear-arm-left {
+  animation: anim-breathe-arm-left 4s ease-in-out infinite;
+  transform-origin: 100px 190px;
+}
+.anim-shinkokyu .bear-arm-right {
+  animation: anim-breathe-arm-right 4s ease-in-out infinite;
+  transform-origin: 220px 190px;
+}
+
+@keyframes anim-breathe {
+  0%, 100% { transform: scale(1, 1) translateY(0); }
+  50% { transform: scale(1.12, 1.15) translateY(-14px); } /* 吸う */
+}
+@keyframes anim-breathe-arm-left {
+  0%, 100% { transform: rotate(10deg); }
+  50% { transform: rotate(-55deg); }
+}
+@keyframes anim-breathe-arm-right {
+  0%, 100% { transform: rotate(-10deg); }
+  50% { transform: rotate(55deg); }
+}
+
+/* ⑬ おじぎして（頭を前にペコリと倒す丁寧なお辞儀） */
+.anim-ojigi {
+  animation: anim-bow-body 2.8s ease-in-out infinite;
+  transform-origin: 50% 85%;
+}
+.anim-ojigi .bear-head-group {
+  animation: anim-bow-head 2.8s ease-in-out infinite;
+  transform-origin: 160px 160px;
+}
+
+@keyframes anim-bow-body {
+  0%, 20%, 80%, 100% { transform: translateY(0) scale(1, 1); }
+  45%, 60% { transform: translateY(16px) scaleY(0.94); }
+}
+@keyframes anim-bow-head {
+  0%, 20%, 80%, 100% { transform: translateY(0) scaleY(1); }
+  45%, 60% { transform: translateY(34px) scaleY(0.85) scaleX(1.03); }
+}
+
+/* ⑭ しゃがんで（小さく屈伸して立つ） */
+.anim-shagamu {
+  animation: anim-squat 2.6s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+
+@keyframes anim-squat {
+  0%, 20%, 80%, 100% { transform: translateY(0) scale(1, 1); }
+  45%, 60% { transform: translateY(50px) scale(1.2, 0.7); }
+}
+
+/* ⑮ のびをして（両手を真上に高く挙げて、ぐーんと背伸び） */
+.anim-nobi {
+  animation: anim-stretch-tall 2.2s ease-in-out infinite alternate;
+  transform-origin: 50% 90%;
+}
+.anim-nobi .bear-arm-left,
+.anim-nobi .bear-arm-right {
+  animation: anim-stretch-arms 2.2s ease-in-out infinite alternate;
+}
+
+@keyframes anim-stretch-tall {
+  0% { transform: scaleY(0.95) scaleX(1.02) translateY(2px); }
+  100% { transform: scaleY(1.22) scaleX(0.92) translateY(-30px); }
+}
+@keyframes anim-stretch-arms {
+  0% { transform: scaleY(0.95); }
+  100% { transform: scaleY(1.15) translateY(-8px); }
+}
+
+/* ⑯ ストップ！ */
+.anim-stop {
+  animation: anim-freeze 1.5s ease-in-out infinite;
+}
+@keyframes anim-freeze {
+  0%, 90%, 100% { transform: scale(1); }
+  95% { transform: scale(1.03); }
+}
+
+/* --------------------------------------------------------------------------
+   モーダル共通スタイル
+   -------------------------------------------------------------------------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(30, 20, 10, 0.6);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fade-in 0.2s ease;
+}
+
+.modal-overlay.hidden {
+  display: none;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-window {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  border: 4px solid var(--border-color);
+  overflow: hidden;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: #FAF3E6;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.modal-header h2 {
+  font-size: 1.6rem;
+  color: var(--text-main);
+}
+
+.btn-close {
+  background: #E2D9C8;
+  color: #5C4E43;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  font-size: 1.4rem;
+}
+
+.btn-close:hover {
+  background: #D1C4AE;
+}
+
+.modal-body {
+  padding: 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modal-footer {
+  padding: 16px 24px;
+  background: #FAF3E6;
+  border-top: 2px solid var(--border-color);
+  display: flex;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.btn-primary-large {
+  background: #E65100;
+  color: #FFF;
+  font-size: 1.4rem;
+  padding: 14px 32px;
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 14px rgba(230, 81, 0, 0.3);
+}
+
+.btn-primary-large:hover {
+  background: #BF360C;
+}
+
+.btn-secondary-modal {
+  background: #E2E8F0;
+  color: #334155;
+  font-size: 1.2rem;
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+}
+
+.btn-primary-modal {
+  background: var(--primary-color);
+  color: #FFF;
+  font-size: 1.2rem;
+  padding: 12px 28px;
+  border-radius: var(--radius-md);
+}
+
+/* --------------------------------------------------------------------------
+   モーダル1: カード選択グリッド
+   -------------------------------------------------------------------------- */
+.modal-instructions {
+  margin-bottom: 16px;
+  background: #FFF9E6;
+  padding: 12px 16px;
+  border-radius: var(--radius-sm);
+  border-left: 5px solid #F59E0B;
+}
+
+.modal-instructions p {
+  font-size: 1.1rem;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+
+.preset-buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-preset {
+  background: #FFF;
+  border: 2px solid #E5D5BC;
+  padding: 8px 16px;
+  font-size: 1rem;
+  border-radius: 20px;
+  color: #78350F;
+}
+
+.btn-preset:hover {
+  background: #FEF3C7;
+  border-color: #F59E0B;
+}
+
+.card-manager-grid {
+  display: grid;
+  grid-template-columns: 1.3fr 1fr;
+  gap: 20px;
+}
+
+.card-pool-section h3,
+.playlist-section h3 {
+  font-size: 1.25rem;
+  margin-bottom: 12px;
+  color: #5C4E43;
+  padding-bottom: 6px;
+  border-bottom: 2px solid #EAE0D0;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.card-item {
+  background: #FFFFFF;
+  border: 3px solid #E5E7EB;
+  border-radius: var(--radius-sm);
+  padding: 10px 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-item:hover {
+  border-color: #F59E0B;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
+}
+
+.card-item.selected {
+  border-color: #10B981;
+  background: #ECFDF5;
+}
+
+.card-item .card-icon {
+  font-size: 2.2rem;
+}
+
+.card-item .card-title {
+  font-size: 1.05rem;
+  font-weight: bold;
+  word-break: break-all;
+  color: var(--text-main);
+}
+
+.card-item .card-badge {
+  font-size: 0.75rem;
+  background: #FEF3C7;
+  color: #B45309;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+/* プレイリスト側（並び順） */
+.playlist-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 4px;
+}
+
+.playlist-item {
+  background: #FFF;
+  border: 2px solid #D1D5DB;
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.04);
+}
+
+.playlist-item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.playlist-item-num {
+  font-size: 1.1rem;
+  font-weight: 900;
+  background: #F3F4F6;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #4B5563;
+}
+
+.playlist-item-text {
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: var(--text-main);
+}
+
+.playlist-item-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.btn-order, .btn-remove-item {
+  background: #F3F4F6;
+  color: #374151;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.btn-order:hover {
+  background: #E5E7EB;
+}
+
+.btn-remove-item {
+  color: #EF4444;
+}
+
+.btn-remove-item:hover {
+  background: #FEE2E2;
+}
+
+/* --------------------------------------------------------------------------
+   モーダル2: 新しい言葉をつくるフォーム
+   -------------------------------------------------------------------------- */
+.create-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: 1.2rem;
+  color: #374151;
+}
+
+.label-hint {
+  font-size: 0.95rem;
+  font-weight: normal;
+  color: #6B7280;
+  margin-left: 8px;
+}
+
+.input-preview-box {
+  display: flex;
+  align-items: center;
+  background: #F3F4F6;
+  border: 3px solid #D1D5DB;
+  border-radius: var(--radius-sm);
+  padding: 6px 16px;
+  gap: 12px;
+}
+
+.preview-prefix {
+  font-size: 1.3rem;
+  font-weight: 800;
+  color: #4B5563;
+  white-space: nowrap;
+}
+
+.input-preview-box input,
+.form-group input[type="text"] {
+  width: 100%;
+  font-family: inherit;
+  font-size: 1.4rem;
+  font-weight: bold;
+  padding: 10px 14px;
+  border: 2px solid #D1D5DB;
+  border-radius: 8px;
+  outline: none;
+}
+
+.input-preview-box input {
+  border: none;
+  background: #FFF;
+}
+
+.input-preview-box input:focus,
+.form-group input[type="text"]:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(230, 81, 0, 0.2);
+}
+
+.pose-selector-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px;
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 6px;
+  background: #F9FAFB;
+  border-radius: var(--radius-sm);
+  border: 2px solid #E5E7EB;
+}
+
+.pose-option {
+  background: #FFF;
+  border: 2px solid #E5E7EB;
+  border-radius: 10px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: bold;
+}
+
+.pose-option.selected {
+  border-color: var(--primary-color);
+  background: #FFF7ED;
+  color: var(--primary-color);
+}
+
+.custom-image-uploader {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px;
+  background: #F9FAFB;
+  border: 2px dashed #D1D5DB;
+  border-radius: var(--radius-sm);
+}
+
+.image-preview {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.image-preview img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 8px;
+  border: 2px solid #E5E7EB;
+  background: #FFF;
+}
+
+.btn-danger-small {
+  background: #FEE2E2;
+  color: #DC2626;
+  padding: 6px 12px;
+  font-size: 0.9rem;
+  border-radius: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   モーダル3: ヘルプ
+   -------------------------------------------------------------------------- */
+.help-content h3 {
+  font-size: 1.3rem;
+  color: #78350F;
+  margin: 18px 0 10px;
+}
+
+.help-box {
+  background: #FFFBEB;
+  border-left: 6px solid #F59E0B;
+  padding: 16px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  line-height: 1.6;
+  font-size: 1.1rem;
+}
+
+.help-steps {
+  padding-left: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.help-content ul {
+  padding-left: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+/* --------------------------------------------------------------------------
+   レスポンシブ・電子黒板向けアジャスト
+   -------------------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .app-container {
+    padding: 8px;
+    height: 100vh;
+  }
+  .app-title {
+    font-size: 1.2rem;
+  }
+  .lyrics-prefix {
+    font-size: 1.6rem;
+  }
+  .action-text {
+    font-size: 2.8rem;
+    padding: 6px 20px;
+  }
+  .bear-wrapper {
+    width: 240px;
+    height: 240px;
+  }
+  .speech-bubble {
+    font-size: 1.1rem;
+    right: -10px;
+    top: -10px;
+  }
+  .nav-button {
+    min-width: 130px;
+    padding: 14px 20px;
+    font-size: 1.4rem;
+  }
+  .card-manager-grid {
+    grid-template-columns: 1fr;
+  }
+}

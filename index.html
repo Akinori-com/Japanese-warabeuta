@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>くまさん くまさん まねっこ＆ことばあそび</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app" class="app-container">
+    <!-- ヘッダーナビゲーション -->
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="app-title">
+          <span class="title-icon">🐻</span>
+          <span class="title-text">くまさん くまさん まねっこ＆ことばあそび</span>
+        </h1>
+      </div>
+      <div class="header-right">
+        <button id="btnHelp" class="btn-icon" title="つかいかた・じゅぎょうのヒント" aria-label="ヘルプ">
+          <span>💡 つかいかた</span>
+        </button>
+        <button id="btnSelectCards" class="btn-primary" title="うたうカードをえらぶ" aria-label="カードをえらぶ">
+          <span>📋 カードをえらぶ</span>
+        </button>
+        <button id="btnCreateCard" class="btn-secondary" title="あたらしいことばをつくる" aria-label="ことばをつくる">
+          <span>✏️ ことばをつくる</span>
+        </button>
+        <button id="btnFullscreen" class="btn-icon" title="ぜんめんひょうじ（でんしこくばん）" aria-label="全画面表示">
+          <span id="fullscreenIcon">⛶ 全画面</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- メインコンテンツエリア：ステージ -->
+    <main class="stage-container">
+      <!-- 歌詞表示エリア -->
+      <section class="lyrics-section" aria-live="polite">
+        <div class="lyrics-prefix">く ま さ ん　く ま さ ん</div>
+        <div class="lyrics-main">
+          <span id="currentActionText" class="action-text">ま わ れ み ぎ</span>
+        </div>
+      </section>
+
+      <!-- くまさんイラスト・アニメーションエリア -->
+      <section class="character-section">
+        <div id="characterStage" class="character-stage" title="くまさんをタッチすると もういちど うごくよ！">
+          <!-- くまさんSVGコンテナ -->
+          <div id="bearContainer" class="bear-wrapper">
+            <!-- SVGはJavaScriptで動的に切り替え・装飾 -->
+          </div>
+          <div class="speech-bubble" id="actionSpeechBubble">
+            <span id="bubbleText">まわってみよう！</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- コントロールバー（大画面タッチ対応） -->
+      <footer class="stage-controls">
+        <button id="btnPrev" class="nav-button btn-prev" aria-label="まえへ">
+          <span class="nav-arrow">◀</span>
+          <span class="nav-label">まえへ</span>
+        </button>
+
+        <div class="progress-indicator">
+          <div id="cardCounter" class="card-counter">1 / 4</div>
+          <div class="auto-play-toggle">
+            <label class="switch-label">
+              <input type="checkbox" id="chkAutoPlay">
+              <span class="switch-slider"></span>
+              <span class="switch-text">じどうでおくる (5びょう)</span>
+            </label>
+          </div>
+        </div>
+
+        <button id="btnNext" class="nav-button btn-next" aria-label="つぎへ">
+          <span class="nav-label">つぎへ</span>
+          <span class="nav-arrow">▶</span>
+        </button>
+      </footer>
+    </main>
+
+    <!-- モーダル1: カード選択・並び替えモーダル -->
+    <div id="modalCardSelect" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalCardSelectTitle">
+      <div class="modal-window">
+        <div class="modal-header">
+          <h2 id="modalCardSelectTitle">📋 うたうカードをえらぼう</h2>
+          <button class="btn-close" id="btnCloseCardSelect" aria-label="とじる">✕</button>
+        </div>
+        <div class="modal-body">
+          <div class="modal-instructions">
+            <p>授業で使うカードにチェックを入れてください。右側の「いまのじゅんばん」で並び替えができます。</p>
+            <div class="preset-buttons">
+              <button id="btnResetToDefault" class="btn-preset">🌱 きほんの４つ（まわれみぎ…）</button>
+              <button id="btnSelectAllCards" class="btn-preset">🌟 ぜんぶえらぶ</button>
+            </div>
+          </div>
+
+          <div class="card-manager-grid">
+            <!-- カードプール（選択候補） -->
+            <div class="card-pool-section">
+              <h3>つかえるカードいちらん</h3>
+              <div id="availableCardList" class="card-grid">
+                <!-- JavaScriptで動的生成 -->
+              </div>
+            </div>
+
+            <!-- 現在のプレイリスト（順番） -->
+            <div class="playlist-section">
+              <h3>いまのじゅんばん（<span id="activeCardCount">4</span>まい）</h3>
+              <div id="activePlaylist" class="playlist-list">
+                <!-- JavaScriptで動的生成 -->
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button id="btnApplyCards" class="btn-primary-large">このじゅんばんで スタート！ ✨</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- モーダル2: 新しい言葉をつくるモーダル -->
+    <div id="modalCreateCard" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalCreateTitle">
+      <div class="modal-window">
+        <div class="modal-header">
+          <h2 id="modalCreateTitle">✏️ あたらしいことばをつくろう</h2>
+          <button class="btn-close" id="btnCloseCreate" aria-label="とじる">✕</button>
+        </div>
+        <div class="modal-body">
+          <form id="createCardForm" class="create-form" onsubmit="return false;">
+            <div class="form-group">
+              <label for="inputActionPhrase">
+                <strong>うしろのことば（どうさ）</strong>
+                <span class="label-hint">※ひらがなで にゅうりょくしてね</span>
+              </label>
+              <div class="input-preview-box">
+                <span class="preview-prefix">くまさん くまさん</span>
+                <input type="text" id="inputActionPhrase" placeholder="例：て を た た い て" required maxlength="18">
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="inputSpeechText">
+                <strong>くまさんのセリフ（ふきだし）</strong>
+              </label>
+              <input type="text" id="inputSpeechText" placeholder="例：いっしょに パチパチしよう！" maxlength="20">
+            </div>
+
+            <div class="form-group">
+              <label>
+                <strong>くまさんのポーズをえらぶ</strong>
+              </label>
+              <div id="poseSelector" class="pose-selector-grid">
+                <!-- ポーズ選択肢一覧 -->
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>
+                <strong>または じぶんのイラストやしゃしんをつかう</strong>
+                <span class="label-hint">（かいた絵や写真のファイルをアップロードできます）</span>
+              </label>
+              <div class="custom-image-uploader">
+                <input type="file" id="inputCustomImage" accept="image/*">
+                <div id="imagePreviewContainer" class="image-preview hidden">
+                  <img id="customImagePreview" src="" alt="プレビュー">
+                  <button type="button" id="btnRemoveImage" class="btn-danger-small">画像を消す</button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" id="btnCancelCreate" class="btn-secondary-modal">キャンセル</button>
+          <button type="button" id="btnSaveCard" class="btn-primary-large">カードをとうろくする 💾</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- モーダル3: つかいかた・じゅぎょうのヒント -->
+    <div id="modalHelp" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalHelpTitle">
+      <div class="modal-window help-modal-window">
+        <div class="modal-header">
+          <h2 id="modalHelpTitle">💡 アプリのつかいかたと単元のヒント</h2>
+          <button class="btn-close" id="btnCloseHelp" aria-label="とじる">✕</button>
+        </div>
+        <div class="modal-body help-content">
+          <h3>本アプリのねらい（特別支援学校小学部 国語科）</h3>
+          <div class="help-box">
+            <p><strong>① まねっこの学習（身体表現・指示理解）</strong><br>
+            「くまさん くまさん まわれみぎ」等のわらべ歌を聞きながら、くまさんのイラストや先生の声かけに合わせて身体を動かし、模倣の楽しさを味わいます。</p>
+            <p><strong>② ことばあそびの学習（語彙の拡張・創造的な表現）</strong><br>
+            「くまさん くまさん ○○○」の○○○に入る新しい言葉（動作）を児童と一緒に考えます。「ジャンプして」「あたまをポンポン」など、言葉が変わるとみんなの動きも変わる面白さを体験します。</p>
+          </div>
+
+          <h3>授業展開のアイディア</h3>
+          <ol class="help-steps">
+            <li>
+              <strong>ステップ1：基本の歌を楽しむ</strong><br>
+              「きほんの４つ」カードで、歌いながら先生と児童で回ったり手をついたりして動きを楽しみます。
+            </li>
+            <li>
+              <strong>ステップ2：プリセットカードでバリエーション体験</strong><br>
+              「カードをえらぶ」から「ジャンプして」「バンザイして」などを追加し、新しい動きに挑戦します。
+            </li>
+            <li>
+              <strong>ステップ3：みんなでオリジナルの言葉をつくる</strong><br>
+              児童から「○○してほしい！」というアイデアを引き出し、「ことばをつくる」ボタンでその場で登録。画面に児童の考えた言葉とくまさんが現れ、達成感や意欲を高めます。
+            </li>
+          </ol>
+
+          <h3>電子黒板・タブレットでの便利な操作</h3>
+          <ul>
+            <li><strong>画面のくまさんをタッチ</strong>：もう一度同じ動作を動かして見せられます（「もう1回やってみよう」の声かけに）。</li>
+            <li><strong>左右の大きなボタン（まえへ／つぎへ）</strong>：電子黒板の前に立った児童自身にタッチさせて進める活動もできます。</li>
+            <li><strong>じどうでおくる（タイマー）</strong>：先生が画面操作から離れて、児童と一緒に身体を動かしたい時に便利です。</li>
+          </ul>
+        </div>
+        <div class="modal-footer">
+          <button id="btnCloseHelpBottom" class="btn-primary-modal">とじる</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
