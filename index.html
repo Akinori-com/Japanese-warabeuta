@@ -93,7 +93,11 @@
             <div class="preset-buttons">
               <button id="btnResetToDefault" class="btn-preset">🌱 きほんの４つ（まわれみぎ…）</button>
               <button id="btnSelectAllCards" class="btn-preset">🌟 ぜんぶえらぶ</button>
+              <button id="btnExportCards" class="btn-preset btn-storage" title="つくったカードをファイルに保存してバックアップします">💾 カードをファイルに保存</button>
+              <button id="btnImportCards" class="btn-preset btn-storage" title="保存したカードファイルを読みこみます">📂 ファイルから読みこみ</button>
+              <input type="file" id="inputImportFile" accept=".json" style="display:none;">
             </div>
+            <p class="storage-notice">※つくったカードはこの端末（ブラウザ）に自動でずっと保存されます。「ファイルに保存」を使うと他の端末にも移せます。</p>
           </div>
 
           <div class="card-manager-grid">

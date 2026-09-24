@@ -643,38 +643,103 @@
   }
 
   // =========================================================================
-  // 4. ストレージ連携
+  // 4. ストレージ連携＆画像圧縮ユーティリティ
   // =========================================================================
 
-  const STORAGE_KEY_CARDS = 'manekko_all_cards_v3';
-  const STORAGE_KEY_PLAYLIST = 'manekko_playlist_v3';
+  const STORAGE_KEY_CARDS = 'manekko_all_cards_persistent_v1';
+  const STORAGE_KEY_PLAYLIST = 'manekko_playlist_persistent_v1';
+
+  /**
+   * 写真を軽量化する関数（最大600pxに自動縮小＆圧縮）
+   * アルバムやカメラの高画質写真（数MB〜十数MB）を約40〜70KBに軽量化し、
+   * 即時反映と確実な永続保存（localStorageへの保存）を実現します。
+   */
+  function compressImage(file, maxWidth, maxHeight, quality, callback) {
+    if (!file || !file.type.match(/image.*/)) {
+      callback(new Error('画像ファイルを選択してください。'));
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+
+        if (width > maxWidth || height > maxHeight) {
+          if (width > height) {
+            height = Math.round((height * maxWidth) / width);
+            width = maxWidth;
+          } else {
+            width = Math.round((width * maxHeight) / height);
+            height = maxHeight;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+
+        const mimeType = (file.type === 'image/png') ? 'image/png' : 'image/jpeg';
+        const compressedDataUrl = canvas.toDataURL(mimeType, quality);
+        callback(null, compressedDataUrl);
+      };
+      img.onerror = () => callback(new Error('画像の読み込みに失敗しました。'));
+      img.src = e.target.result;
+    };
+    reader.onerror = () => callback(new Error('ファイルの読み込みに失敗しました。'));
+    reader.readAsDataURL(file);
+  }
 
   function loadData() {
     try {
-      const savedCards = localStorage.getItem(STORAGE_KEY_CARDS);
-      if (savedCards) {
-        allCards = JSON.parse(savedCards);
-      } else {
-        allCards = [...DEFAULT_CARDS];
-        saveCards();
+      // 過去のストレージキー（v1〜v3）も含めて自作カードを確実に救出・統合する
+      let existingCustomCards = [];
+      const keysToCheck = [
+        STORAGE_KEY_CARDS,
+        'manekko_all_cards_v3',
+        'manekko_all_cards_v2',
+        'manekko_all_cards_v1'
+      ];
+
+      keysToCheck.forEach(key => {
+        try {
+          const raw = localStorage.getItem(key);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed)) {
+              parsed.forEach(c => {
+                if (c && !c.isDefault && !existingCustomCards.some(e => e.id === c.id)) {
+                  existingCustomCards.push(c);
+                }
+              });
+            }
+          }
+        } catch (_) {}
+      });
+
+      // 常に最新のデフォルトカードに、ユーザーが作った自作カードをマージ
+      allCards = [...DEFAULT_CARDS, ...existingCustomCards];
+
+      const savedPlaylist = localStorage.getItem(STORAGE_KEY_PLAYLIST) || localStorage.getItem('manekko_playlist_v3');
+      if (savedPlaylist) {
+        const parsedPlaylist = JSON.parse(savedPlaylist);
+        // 存在確認
+        playlistIds = parsedPlaylist.filter(id => allCards.some(c => c.id === id));
       }
 
-      const savedPlaylist = localStorage.getItem(STORAGE_KEY_PLAYLIST);
-      if (savedPlaylist) {
-        playlistIds = JSON.parse(savedPlaylist);
-      } else {
-        // 初期は基本の4つ
+      if (!playlistIds || playlistIds.length === 0) {
         playlistIds = ['default_maware', 'default_ryoute', 'default_kataashi', 'default_sayounara'];
-        savePlaylist();
       }
+
+      saveCards();
+      savePlaylist();
     } catch (e) {
       console.warn('LocalStorage access error, fallback to defaults:', e);
       allCards = [...DEFAULT_CARDS];
-      playlistIds = ['default_maware', 'default_ryoute', 'default_kataashi', 'default_sayounara'];
-    }
-
-    // プレイリストが空になってしまった場合の保護
-    if (!playlistIds || playlistIds.length === 0) {
       playlistIds = ['default_maware', 'default_ryoute', 'default_kataashi', 'default_sayounara'];
     }
   }
@@ -682,8 +747,11 @@
   function saveCards() {
     try {
       localStorage.setItem(STORAGE_KEY_CARDS, JSON.stringify(allCards));
+      return true;
     } catch (e) {
-      console.warn('Could not save cards to localStorage:', e);
+      console.error('Could not save cards to localStorage:', e);
+      alert('【容量エラー】保存容量がいっぱいです。不要な自作カードを削除するか、「カードをファイルに保存」でバックアップしてください。');
+      return false;
     }
   }
 
@@ -835,6 +903,10 @@
   const btnResetToDefault = document.getElementById('btnResetToDefault');
   const btnSelectAllCards = document.getElementById('btnSelectAllCards');
 
+  const btnExportCards = document.getElementById('btnExportCards');
+  const btnImportCards = document.getElementById('btnImportCards');
+  const inputImportFile = document.getElementById('inputImportFile');
+
   // 編集用一時プレイリスト
   let tempPlaylistIds = [];
 
@@ -848,24 +920,144 @@
     modalCardSelect.classList.add('hidden');
   }
 
+  // 自作カードの削除
+  function deleteCustomCard(cardId) {
+    const card = allCards.find(c => c.id === cardId);
+    if (!card || card.isDefault) return;
+
+    if (!confirm(`「${card.text}」のカードを削除しますか？`)) {
+      return;
+    }
+
+    allCards = allCards.filter(c => c.id !== cardId);
+    tempPlaylistIds = tempPlaylistIds.filter(id => id !== cardId);
+    playlistIds = playlistIds.filter(id => id !== cardId);
+
+    if (playlistIds.length === 0) {
+      playlistIds = ['default_maware'];
+    }
+    if (currentIndex >= playlistIds.length) {
+      currentIndex = 0;
+    }
+
+    saveCards();
+    savePlaylist();
+    renderCardSelectModal();
+    renderCurrentStage();
+  }
+
+  // ファイルへエクスポート（ダウンロード）
+  function exportCardsToFile() {
+    const customCards = allCards.filter(c => !c.isDefault);
+    const exportData = {
+      app: 'kumasan-manekko',
+      version: '1.0',
+      exportedAt: new Date().toISOString(),
+      customCards: customCards,
+      playlistIds: playlistIds
+    };
+
+    const jsonStr = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([jsonStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    const dateStr = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    a.href = url;
+    a.download = `くまさんカード保存_${dateStr}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // ファイルからインポート（読み込み）
+  function importCardsFromFile(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const imported = JSON.parse(event.target.result);
+        if (!imported || !Array.isArray(imported.customCards)) {
+          alert('正しいカード保存ファイルではありません。');
+          return;
+        }
+
+        let addedCount = 0;
+        imported.customCards.forEach(newCard => {
+          if (!allCards.some(c => c.id === newCard.id)) {
+            allCards.push(newCard);
+            addedCount++;
+          }
+        });
+
+        if (Array.isArray(imported.playlistIds)) {
+          imported.playlistIds.forEach(id => {
+            if (!tempPlaylistIds.includes(id) && allCards.some(c => c.id === id)) {
+              tempPlaylistIds.push(id);
+            }
+          });
+        }
+
+        saveCards();
+        renderCardSelectModal();
+        alert(`${addedCount}枚のカードを読み込みました！`);
+      } catch (err) {
+        alert('ファイルの読み込みに失敗しました: ' + err.message);
+      } finally {
+        e.target.value = '';
+      }
+    };
+    reader.readAsText(file);
+  }
+
   function renderCardSelectModal() {
     // 利用可能カード一覧
     availableCardList.innerHTML = '';
     allCards.forEach(card => {
       const isSelected = tempPlaylistIds.includes(card.id);
       const poseInfo = POSE_DEFINITIONS[card.pose] || { icon: '🐻' };
-      const icon = card.customImage ? '🖼️' : poseInfo.icon;
+
+      // サムネイル表示（写真カードの場合は実際の写真を表示）
+      let iconHtml = `<div class="card-icon">${poseInfo.icon}</div>`;
+      if (card.customImage) {
+        iconHtml = `<div class="card-icon"><img src="${card.customImage}" alt="${card.text}" class="card-item-thumb"></div>`;
+      }
+
+      // バッジ表示
+      let badgeHtml = '';
+      if (card.isDefault) {
+        badgeHtml = '<span class="card-badge">きほん</span>';
+      } else {
+        badgeHtml = '<span class="card-badge card-badge-custom">じさく</span>';
+      }
+
+      // 自作カード専用の削除ボタン
+      let trashHtml = '';
+      if (!card.isDefault) {
+        trashHtml = `<button class="btn-card-trash" title="このカードを削除">🗑️</button>`;
+      }
 
       const cardEl = document.createElement('div');
       cardEl.className = `card-item ${isSelected ? 'selected' : ''}`;
       cardEl.innerHTML = `
-        <div class="card-icon">${icon}</div>
+        ${trashHtml}
+        ${iconHtml}
         <div class="card-title">${card.text}</div>
-        ${card.isDefault ? '<span class="card-badge">きほん</span>' : ''}
+        ${badgeHtml}
       `;
-      cardEl.addEventListener('click', () => {
+
+      cardEl.addEventListener('click', (e) => {
+        // 削除ボタンが押された場合
+        if (e.target.closest('.btn-card-trash')) {
+          e.stopPropagation();
+          deleteCustomCard(card.id);
+          return;
+        }
         toggleCardInPlaylist(card.id);
       });
+
       availableCardList.appendChild(cardEl);
     });
 
@@ -950,6 +1142,14 @@
     renderCardSelectModal();
   });
 
+  if (btnExportCards) {
+    btnExportCards.addEventListener('click', exportCardsToFile);
+  }
+  if (btnImportCards && inputImportFile) {
+    btnImportCards.addEventListener('click', () => inputImportFile.click());
+    inputImportFile.addEventListener('change', importCardsFromFile);
+  }
+
   btnApplyCards.addEventListener('click', () => {
     playlistIds = [...tempPlaylistIds];
     currentIndex = 0;
@@ -1010,17 +1210,20 @@
     });
   }
 
+  // 写真選択時の処理（高解像度写真を最大600pxに自動圧縮・即時反映）
   inputCustomImage.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      customImageDataUrl = event.target.result;
+    compressImage(file, 600, 600, 0.82, (err, dataUrl) => {
+      if (err) {
+        alert(err.message);
+        return;
+      }
+      customImageDataUrl = dataUrl;
       customImagePreview.src = customImageDataUrl;
       imagePreviewContainer.classList.remove('hidden');
-    };
-    reader.readAsDataURL(file);
+    });
   });
 
   btnRemoveImage.addEventListener('click', () => {
