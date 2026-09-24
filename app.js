@@ -770,7 +770,6 @@
   const elActionText = document.getElementById('currentActionText');
   const elBearContainer = document.getElementById('bearContainer');
   const elCharacterStage = document.getElementById('characterStage');
-  const elBubbleText = document.getElementById('bubbleText');
   const elCardCounter = document.getElementById('cardCounter');
   const elChkAutoPlay = document.getElementById('chkAutoPlay');
 
@@ -790,9 +789,6 @@
     elActionText.style.animation = 'none';
     void elActionText.offsetWidth; // リフロー
     elActionText.style.animation = 'pop-text 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
-
-    // ふきだしテキスト
-    elBubbleText.textContent = card.speech || 'いっしょに やってみよう！';
 
     // くまさんキャラクター描画
     if (card.customImage) {
@@ -821,11 +817,6 @@
         setTimeout(() => { elBearContainer.style.transform = ''; }, 200);
       }, 150);
     }
-
-    // ふきだしもポンと跳ねる
-    const bubble = document.getElementById('actionSpeechBubble');
-    bubble.style.transform = 'scale(1.2)';
-    setTimeout(() => { bubble.style.transform = ''; }, 300);
   }
 
   function goNext() {
@@ -1168,7 +1159,6 @@
   const btnCancelCreate = document.getElementById('btnCancelCreate');
   const btnSaveCard = document.getElementById('btnSaveCard');
   const inputActionPhrase = document.getElementById('inputActionPhrase');
-  const inputSpeechText = document.getElementById('inputSpeechText');
   const poseSelector = document.getElementById('poseSelector');
   const inputCustomImage = document.getElementById('inputCustomImage');
   const imagePreviewContainer = document.getElementById('imagePreviewContainer');
@@ -1177,7 +1167,6 @@
 
   function openCreateModal() {
     inputActionPhrase.value = '';
-    inputSpeechText.value = '';
     customImageDataUrl = null;
     inputCustomImage.value = '';
     imagePreviewContainer.classList.add('hidden');
@@ -1240,13 +1229,11 @@
       return;
     }
 
-    const speechVal = inputSpeechText.value.trim() || `${textVal}！`;
     const newCardId = 'custom_' + Date.now();
 
     const newCard = {
       id: newCardId,
       text: textVal,
-      speech: speechVal,
       pose: selectedNewPose,
       isDefault: false,
       customImage: customImageDataUrl
