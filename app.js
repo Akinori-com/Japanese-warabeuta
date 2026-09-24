@@ -422,14 +422,25 @@
 
     if (pose.arms === 'wave') {
       armsSvg = `
-        <!-- 左腕通常、右腕バイバイ -->
+        <!-- 左腕通常、右腕バイバイ：肩(220, 180)から右上へ綺麗に伸びる -->
         <g class="bear-arm-left">
           <ellipse cx="90" cy="190" rx="20" ry="35" fill="#8D5B28" stroke="#6D431B" stroke-width="4" transform="rotate(20 90 190)" />
         </g>
         <g class="bear-arm-right">
-          <ellipse cx="240" cy="150" rx="20" ry="36" fill="#8D5B28" stroke="#6D431B" stroke-width="4" transform="rotate(40 240 150)" />
-          <!-- 手のひら -->
-          <circle cx="255" cy="125" r="16" fill="#C2874E" stroke="#6D431B" stroke-width="3" />
+          <path d="M220 180 Q240 135 250 110" stroke="#8D5B28" stroke-width="34" stroke-linecap="round" fill="none" />
+          <circle cx="252" cy="105" r="18" fill="#C2874E" stroke="#6D431B" stroke-width="3" />
+        </g>
+      `;
+    } else if (pose.arms === 'balance') {
+      armsSvg = `
+        <!-- 両手を左右に広げてバランスをとる（かたあしあげて） -->
+        <g class="bear-arm-left">
+          <ellipse cx="75" cy="180" rx="35" ry="18" fill="#8D5B28" stroke="#6D431B" stroke-width="4" transform="rotate(-10 75 180)" />
+          <circle cx="45" cy="178" r="15" fill="#C2874E" stroke="#6D431B" stroke-width="3" />
+        </g>
+        <g class="bear-arm-right">
+          <ellipse cx="245" cy="180" rx="35" ry="18" fill="#8D5B28" stroke="#6D431B" stroke-width="4" transform="rotate(10 245 180)" />
+          <circle cx="275" cy="178" r="15" fill="#C2874E" stroke="#6D431B" stroke-width="3" />
         </g>
       `;
     } else if (pose.arms === 'clap') {
@@ -504,12 +515,14 @@
       `;
     } else if (pose.arms === 'down') {
       armsSvg = `
-        <!-- 前屈みで両手を床につく -->
+        <!-- 前屈みで両手を床につく：両手が地面(cy=278)にペタッと接地 -->
         <g class="bear-arm-left">
-          <ellipse cx="110" cy="245" rx="18" ry="38" fill="#8D5B28" stroke="#6D431B" stroke-width="4" transform="rotate(-15 110 245)" />
+          <path d="M110 200 L95 272" stroke="#8D5B28" stroke-width="34" stroke-linecap="round" fill="none" />
+          <ellipse cx="95" cy="276" rx="20" ry="12" fill="#C2874E" stroke="#6D431B" stroke-width="3" />
         </g>
         <g class="bear-arm-right">
-          <ellipse cx="210" cy="245" rx="18" ry="38" fill="#8D5B28" stroke="#6D431B" stroke-width="4" transform="rotate(15 210 245)" />
+          <path d="M210 200 L225 272" stroke="#8D5B28" stroke-width="34" stroke-linecap="round" fill="none" />
+          <ellipse cx="225" cy="276" rx="20" ry="12" fill="#C2874E" stroke="#6D431B" stroke-width="3" />
         </g>
       `;
     }
@@ -527,71 +540,23 @@
 
     if (pose.legs === 'one-up') {
       legsSvg = `
-        <!-- 片足を上げる（右足をひょい） -->
+        <!-- 片足を上げる（右足をグッと高く持ち上げる） -->
         <g class="bear-leg-left">
-          <ellipse cx="120" cy="265" rx="28" ry="18" fill="#75471F" stroke="#543112" stroke-width="3" />
+          <ellipse cx="125" cy="265" rx="28" ry="18" fill="#75471F" stroke="#543112" stroke-width="3" />
         </g>
         <g class="bear-leg-right">
-          <ellipse cx="225" cy="225" rx="24" ry="16" fill="#75471F" stroke="#543112" stroke-width="3" transform="rotate(-30 225 225)" />
+          <ellipse cx="230" cy="215" rx="26" ry="17" fill="#75471F" stroke="#543112" stroke-width="3" transform="rotate(-35 230 215)" />
         </g>
       `;
-    }
-
-    // 回れ右（まわれみぎ）の場合：正面と背面の両方を出力し、CSSアニメーションで表裏を切り替える
-    if (poseKey === 'maware') {
-      return `
-        <svg class="bear-svg ${pose.animClass}" viewBox="0 0 320 320" xmlns="http://www.w3.org/2000/svg">
-          <!-- 影 -->
-          <ellipse cx="160" cy="285" rx="90" ry="16" fill="#E2D9C8" />
-
-          <!-- 正面グループ（前を向いている時） -->
-          <g class="bear-front-group">
-            <!-- 耳 -->
-            <g class="bear-ears">
-              <circle cx="95" cy="80" r="28" fill="#A06934" stroke="#6D431B" stroke-width="4" />
-              <circle cx="95" cy="80" r="16" fill="#F8B4B4" />
-              <circle cx="225" cy="80" r="28" fill="#A06934" stroke="#6D431B" stroke-width="4" />
-              <circle cx="225" cy="80" r="16" fill="#F8B4B4" />
-            </g>
-            <!-- 足 -->
-            ${legsSvg}
-            <!-- 体 -->
-            <ellipse cx="160" cy="205" rx="80" ry="70" fill="#A06934" stroke="#6D431B" stroke-width="5" />
-            <ellipse cx="160" cy="205" rx="50" ry="46" fill="#FEEFD0" />
-            <!-- 腕 -->
-            ${armsSvg}
-            <!-- 頭 -->
-            <circle cx="160" cy="120" r="72" fill="#A06934" stroke="#6D431B" stroke-width="5" />
-            <ellipse cx="115" cy="135" rx="14" ry="8" fill="#FFA4A4" opacity="0.8" />
-            <ellipse cx="205" cy="135" rx="14" ry="8" fill="#FFA4A4" opacity="0.8" />
-            <!-- 目 -->
-            ${eyesSvg}
-            <!-- マズル -->
-            <ellipse cx="160" cy="138" rx="28" ry="22" fill="#FEEFD0" />
-            <ellipse cx="160" cy="128" rx="11" ry="8" fill="#2B1810" />
-            <!-- 口 -->
-            ${mouthSvg}
-          </g>
-
-          <!-- 背面グループ（回れ右で後ろを向いた時） -->
-          <g class="bear-back-group">
-            <!-- 後頭部の耳 -->
-            <circle cx="95" cy="80" r="28" fill="#8D5B28" stroke="#6D431B" stroke-width="4" />
-            <circle cx="225" cy="80" r="28" fill="#8D5B28" stroke="#6D431B" stroke-width="4" />
-            <!-- 後ろ足 -->
-            <ellipse cx="115" cy="270" rx="30" ry="20" fill="#75471F" />
-            <ellipse cx="205" cy="270" rx="30" ry="20" fill="#75471F" />
-            <!-- 体（後ろ姿） -->
-            <ellipse cx="160" cy="210" rx="85" ry="75" fill="#A06934" stroke="#6D431B" stroke-width="5" />
-            <!-- しっぽ -->
-            <circle cx="160" cy="225" r="24" fill="#C2874E" stroke="#6D431B" stroke-width="4" />
-            <!-- 頭（後ろ向き） -->
-            <circle cx="160" cy="120" r="75" fill="#A06934" stroke="#6D431B" stroke-width="5" />
-            <!-- 腕 -->
-            <ellipse cx="80" cy="180" rx="22" ry="38" fill="#8D5B28" stroke="#6D431B" stroke-width="4" transform="rotate(25 80 180)" />
-            <ellipse cx="240" cy="180" rx="22" ry="38" fill="#8D5B28" stroke="#6D431B" stroke-width="4" transform="rotate(-25 240 180)" />
-          </g>
-        </svg>
+    } else if (pose.legs === 'squat') {
+      legsSvg = `
+        <!-- しゃがみ・両手つきの足（外側にしっかり踏ん張る） -->
+        <g class="bear-leg-left">
+          <ellipse cx="110" cy="268" rx="28" ry="16" fill="#75471F" stroke="#543112" stroke-width="3" transform="rotate(10 110 268)" />
+        </g>
+        <g class="bear-leg-right">
+          <ellipse cx="210" cy="268" rx="28" ry="16" fill="#75471F" stroke="#543112" stroke-width="3" transform="rotate(-10 210 268)" />
+        </g>
       `;
     }
 

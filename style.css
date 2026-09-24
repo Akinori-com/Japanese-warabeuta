@@ -382,87 +382,151 @@ button:active {
   overflow: visible;
 }
 
-/* ① まわれみぎ（身体の垂直軸を中心にした「回れ右」水平ターン） */
+/* ① まわれみぎ（右足を軸に「くるっ」と右回りにターン） */
 .anim-maware {
-  animation: anim-maware-turn 3s ease-in-out infinite;
-  transform-origin: 50% 50%;
-  transform-style: preserve-3d;
+  animation: anim-maware-turn 3.2s ease-in-out infinite;
+  transform-origin: 200px 265px; /* 右足を軸にして回転 */
 }
 
 @keyframes anim-maware-turn {
   0%, 15% {
-    /* 前を向いてピシッと立つ */
-    transform: rotateY(0deg) translateY(0);
+    /* 正面で気をつけ */
+    transform: scaleX(1) translateY(0);
   }
-  30% {
-    /* 右足・腰を軸に右へ90度ターン（真横） */
-    transform: rotateY(-90deg) translateY(-6px);
+  28% {
+    /* 右足を踏み込んでターン開始（少し体が浮く） */
+    transform: scaleX(0.15) translateY(-12px);
   }
-  45%, 65% {
-    /* 完全に後ろを向く（180度ターン完了） */
-    transform: rotateY(-180deg) translateY(0);
+  40%, 65% {
+    /* 回れ右！後ろを向く（左右反転してピシッと停止） */
+    transform: scaleX(-1) translateY(0);
   }
-  80% {
-    /* 再び右から回って横を向く（270度） */
-    transform: rotateY(-270deg) translateY(-6px);
+  78% {
+    /* 再び右足を軸に正面へ戻る */
+    transform: scaleX(0.15) translateY(-12px);
   }
-  95%, 100% {
-    /* 正面に戻る（360度完了） */
-    transform: rotateY(-360deg) translateY(0);
+  90%, 100% {
+    /* 正面に戻る */
+    transform: scaleX(1) translateY(0);
   }
 }
 
-/* 回れ右の表裏（正面と後ろ姿）のリアルタイム切り替え */
-.anim-maware .bear-front-group {
-  animation: anim-front-toggle 3s infinite;
-}
-.anim-maware .bear-back-group {
-  animation: anim-back-toggle 3s infinite;
-}
-
-@keyframes anim-front-toggle {
-  0%, 28% { opacity: 1; visibility: visible; }
-  29%, 76% { opacity: 0; visibility: hidden; }
-  77%, 100% { opacity: 1; visibility: visible; }
-}
-
-@keyframes anim-back-toggle {
-  0%, 28% { opacity: 0; visibility: hidden; }
-  29%, 76% { opacity: 1; visibility: visible; }
-  77%, 100% { opacity: 0; visibility: hidden; }
-}
-
-/* ② りょうてをついて（前屈みになって両手を下につく） */
+/* ② りょうてをついて（床に両手をついてペタッ） */
 .anim-ryoute {
-  animation: anim-bow 2s ease-in-out infinite;
-  transform-origin: 50% 85%;
+  animation: anim-ryoute-body 2.2s ease-in-out infinite;
+  transform-origin: 160px 270px;
+}
+.anim-ryoute .bear-head-group {
+  animation: anim-ryoute-head 2.2s ease-in-out infinite;
+  transform-origin: 160px 180px;
+}
+.anim-ryoute .bear-arm-left,
+.anim-ryoute .bear-arm-right {
+  animation: anim-ryoute-hands 2.2s ease-in-out infinite;
+  transform-origin: 160px 200px;
 }
 
-@keyframes anim-bow {
-  0%, 100% { transform: translateY(0) scaleY(1); }
-  40%, 60% { transform: translateY(40px) scaleY(0.85); }
+@keyframes anim-ryoute-body {
+  0%, 100% {
+    transform: translateY(0) scale(1, 1);
+  }
+  40%, 75% {
+    /* 少し腰を落として安定 */
+    transform: translateY(8px) scale(1.02, 0.96);
+  }
 }
 
-/* ③ かたあしあげて（片足をあげてバランスをとる） */
+@keyframes anim-ryoute-head {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  40%, 75% {
+    /* 頭が床に向かってしっかりお辞儀 */
+    transform: translateY(16px);
+  }
+}
+
+@keyframes anim-ryoute-hands {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  35% {
+    /* 手を少し引いて構える */
+    transform: translateY(-8px);
+  }
+  45%, 75% {
+    /* ゆかに ぺったん！ */
+    transform: translateY(10px);
+  }
+}
+
+/* ③ かたあしあげて（左足で立ち、両手を広げておっとっと！） */
 .anim-kataashi {
-  animation: anim-balance 1.8s ease-in-out infinite alternate;
-  transform-origin: 40% 90%;
+  animation: anim-kataashi-body 2s ease-in-out infinite alternate;
+  transform-origin: 125px 265px; /* 左足を軸足として床に固定 */
+}
+.anim-kataashi .bear-arm-left {
+  animation: anim-kataashi-arm-l 1s ease-in-out infinite alternate;
+  transform-origin: 90px 180px;
+}
+.anim-kataashi .bear-arm-right {
+  animation: anim-kataashi-arm-r 1s ease-in-out infinite alternate;
+  transform-origin: 230px 180px;
 }
 
-@keyframes anim-balance {
-  0% { transform: rotate(-8deg) translateY(-10px); }
-  100% { transform: rotate(8deg) translateY(0); }
+@keyframes anim-kataashi-body {
+  0% {
+    transform: rotate(-5deg) translateY(-2px);
+  }
+  100% {
+    transform: rotate(4deg) translateY(0);
+  }
 }
 
-/* ④ さようなら（バイバイと手を振る） */
+@keyframes anim-kataashi-arm-l {
+  0% {
+    transform: rotate(-10deg);
+  }
+  100% {
+    transform: rotate(8deg);
+  }
+}
+
+@keyframes anim-kataashi-arm-r {
+  0% {
+    transform: rotate(10deg);
+  }
+  100% {
+    transform: rotate(-8deg);
+  }
+}
+
+/* ④ さようなら（笑顔でバイバイと手を振る） */
+.anim-sayounara {
+  animation: anim-sayounara-body 1.6s ease-in-out infinite alternate;
+  transform-origin: 160px 265px;
+}
 .anim-sayounara .bear-arm-right {
-  animation: anim-wave 0.8s ease-in-out infinite alternate;
-  transform-origin: 220px 180px;
+  animation: anim-sayounara-arm 0.75s ease-in-out infinite alternate;
+  transform-origin: 220px 180px; /* 肩を軸に振る */
 }
 
-@keyframes anim-wave {
-  0% { transform: rotate(-25deg); }
-  100% { transform: rotate(35deg); }
+@keyframes anim-sayounara-body {
+  0% {
+    transform: rotate(-2deg);
+  }
+  100% {
+    transform: rotate(2deg);
+  }
+}
+
+@keyframes anim-sayounara-arm {
+  0% {
+    transform: rotate(-12deg);
+  }
+  100% {
+    transform: rotate(16deg);
+  }
 }
 
 /* ⑤ ジャンプ（高く跳ねる） */
