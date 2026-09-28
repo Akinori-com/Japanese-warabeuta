@@ -1115,37 +1115,170 @@
   });
 
   // =========================================================================
-  // 8. モーダル2: 新しい言葉をつくる（カスタム追加）
+  // 8. モーダル2: 新しいカードをつくる（1画面1工程ステップウィザード）
   // =========================================================================
 
   const modalCreateCard = document.getElementById('modalCreateCard');
   const btnCreateCard = document.getElementById('btnCreateCard');
   const btnCloseCreate = document.getElementById('btnCloseCreate');
-  const btnCancelCreate = document.getElementById('btnCancelCreate');
-  const btnSaveCard = document.getElementById('btnSaveCard');
+
+  // ステップコンテナ
+  const createStep1 = document.getElementById('createStep1');
+  const createStep2 = document.getElementById('createStep2');
+  const createStep3 = document.getElementById('createStep3');
+
+  // ステップインジケーター
+  const indicatorStep1 = document.getElementById('indicatorStep1');
+  const indicatorStep2 = document.getElementById('indicatorStep2');
+  const indicatorStep3 = document.getElementById('indicatorStep3');
+  const indicatorLine1 = document.getElementById('indicatorLine1');
+  const indicatorLine2 = document.getElementById('indicatorLine2');
+
+  // ウィザード用ナビゲーションボタン
+  const btnWizardCancel = document.getElementById('btnWizardCancel');
+  const btnWizardPrev = document.getElementById('btnWizardPrev');
+  const btnWizardNext = document.getElementById('btnWizardNext');
+  const btnWizardFinish = document.getElementById('btnWizardFinish');
+
+  // ステップ1要素
   const inputActionPhrase = document.getElementById('inputActionPhrase');
+  const suggestButtons = document.querySelectorAll('.btn-suggest');
+
+  // ステップ2要素
+  const tabChoosePose = document.getElementById('tabChoosePose');
+  const tabChoosePhoto = document.getElementById('tabChoosePhoto');
+  const panelChoosePose = document.getElementById('panelChoosePose');
+  const panelChoosePhoto = document.getElementById('panelChoosePhoto');
   const poseSelector = document.getElementById('poseSelector');
+  const btnTriggerPhoto = document.getElementById('btnTriggerPhoto');
   const inputCustomImage = document.getElementById('inputCustomImage');
+  const photoEmptyState = document.getElementById('photoEmptyState');
   const imagePreviewContainer = document.getElementById('imagePreviewContainer');
   const customImagePreview = document.getElementById('customImagePreview');
+  const btnRetakePhoto = document.getElementById('btnRetakePhoto');
   const btnRemoveImage = document.getElementById('btnRemoveImage');
+
+  // ステップ3要素
+  const finalPreviewText = document.getElementById('finalPreviewText');
+  const finalPreviewCharacter = document.getElementById('finalPreviewCharacter');
+
+  // ウィザード内部状態
+  let currentWizardStep = 1;
+  let mediaChoiceMode = 'pose'; // 'pose' または 'photo'
 
   function openCreateModal() {
     inputActionPhrase.value = '';
     customImageDataUrl = null;
     inputCustomImage.value = '';
-    imagePreviewContainer.classList.add('hidden');
     selectedNewPose = 'jump';
+    mediaChoiceMode = 'pose';
 
+    // 写真プレビューリセット
+    photoEmptyState.classList.remove('hidden');
+    imagePreviewContainer.classList.add('hidden');
+
+    // タブ表示リセット
+    setMediaMode('pose');
     renderPoseSelector();
+
+    // ステップ1からスタート
+    goToWizardStep(1);
+
     modalCreateCard.classList.remove('hidden');
-    setTimeout(() => inputActionPhrase.focus(), 100);
+    setTimeout(() => inputActionPhrase.focus(), 150);
   }
 
   function closeCreateModal() {
     modalCreateCard.classList.add('hidden');
   }
 
+  // ステップ切り替え処理
+  function goToWizardStep(step) {
+    currentWizardStep = step;
+
+    // 各ステップの表示・非表示切り替え
+    createStep1.classList.toggle('hidden', step !== 1);
+    createStep2.classList.toggle('hidden', step !== 2);
+    createStep3.classList.toggle('hidden', step !== 3);
+
+    // インジケーターの更新
+    indicatorStep1.className = 'step-indicator-item ' + (step === 1 ? 'active' : step > 1 ? 'completed' : '');
+    indicatorStep2.className = 'step-indicator-item ' + (step === 2 ? 'active' : step > 2 ? 'completed' : '');
+    indicatorStep3.className = 'step-indicator-item ' + (step === 3 ? 'active' : '');
+
+    indicatorLine1.className = 'step-indicator-line ' + (step > 1 ? 'active' : '');
+    indicatorLine2.className = 'step-indicator-line ' + (step > 2 ? 'active' : '');
+
+    // フッターナビゲーションボタンの制御
+    if (step === 1) {
+      btnWizardCancel.classList.remove('hidden');
+      btnWizardPrev.classList.add('hidden');
+      btnWizardNext.classList.remove('hidden');
+      btnWizardFinish.classList.add('hidden');
+      btnWizardNext.textContent = 'つぎへ すすむ ➔';
+    } else if (step === 2) {
+      btnWizardCancel.classList.remove('hidden');
+      btnWizardPrev.classList.remove('hidden');
+      btnWizardNext.classList.remove('hidden');
+      btnWizardFinish.classList.add('hidden');
+      btnWizardNext.textContent = 'かくにんへ すすむ ➔';
+    } else if (step === 3) {
+      btnWizardCancel.classList.add('hidden');
+      btnWizardPrev.classList.remove('hidden');
+      btnWizardPrev.textContent = '◀ なおす（まえへ）';
+      btnWizardNext.classList.add('hidden');
+      btnWizardFinish.classList.remove('hidden');
+
+      // 最終プレビューの更新
+      renderFinalPreview();
+    }
+  }
+
+  // ステップ3: 最終確認プレビュー生成
+  function renderFinalPreview() {
+    const textVal = inputActionPhrase.value.trim() || 'て を た た い て';
+    finalPreviewText.textContent = textVal;
+
+    finalPreviewCharacter.innerHTML = '';
+    if (mediaChoiceMode === 'photo' && customImageDataUrl) {
+      const img = document.createElement('img');
+      img.src = customImageDataUrl;
+      img.alt = 'じぶんのしゃしん';
+      finalPreviewCharacter.appendChild(img);
+    } else {
+      // くまさんのポーズ（アニメーション付き）
+      finalPreviewCharacter.innerHTML = generateBearSVG(selectedNewPose);
+    }
+  }
+
+  // ステップ1: おすすめ言葉ボタンのクリック
+  suggestButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      inputActionPhrase.value = btn.textContent;
+      inputActionPhrase.focus();
+    });
+  });
+
+  // ステップ2: メディア選択タブ切り替え
+  function setMediaMode(mode) {
+    mediaChoiceMode = mode;
+    if (mode === 'pose') {
+      tabChoosePose.classList.add('active');
+      tabChoosePhoto.classList.remove('active');
+      panelChoosePose.classList.remove('hidden');
+      panelChoosePhoto.classList.add('hidden');
+    } else {
+      tabChoosePhoto.classList.add('active');
+      tabChoosePose.classList.remove('active');
+      panelChoosePhoto.classList.remove('hidden');
+      panelChoosePose.classList.add('hidden');
+    }
+  }
+
+  tabChoosePose.addEventListener('click', () => setMediaMode('pose'));
+  tabChoosePhoto.addEventListener('click', () => setMediaMode('photo'));
+
+  // ポーズ選択肢一覧の描画
   function renderPoseSelector() {
     poseSelector.innerHTML = '';
     Object.keys(POSE_DEFINITIONS).forEach(key => {
@@ -1153,18 +1286,22 @@
       const opt = document.createElement('div');
       opt.className = `pose-option ${selectedNewPose === key ? 'selected' : ''}`;
       opt.innerHTML = `
-        <span style="font-size:1.8rem">${p.icon}</span>
+        <span style="font-size:2.2rem">${p.icon}</span>
         <span>${p.name}</span>
       `;
       opt.addEventListener('click', () => {
         selectedNewPose = key;
+        mediaChoiceMode = 'pose';
         renderPoseSelector();
       });
       poseSelector.appendChild(opt);
     });
   }
 
-  // 写真選択時の処理（高解像度写真を最大600pxに自動圧縮・即時反映）
+  // 写真撮影・アップロード処理
+  btnTriggerPhoto.addEventListener('click', () => inputCustomImage.click());
+  btnRetakePhoto.addEventListener('click', () => inputCustomImage.click());
+
   inputCustomImage.addEventListener('change', (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -1176,32 +1313,68 @@
       }
       customImageDataUrl = dataUrl;
       customImagePreview.src = customImageDataUrl;
+      photoEmptyState.classList.add('hidden');
       imagePreviewContainer.classList.remove('hidden');
+      mediaChoiceMode = 'photo';
     });
   });
 
   btnRemoveImage.addEventListener('click', () => {
     customImageDataUrl = null;
     inputCustomImage.value = '';
+    photoEmptyState.classList.remove('hidden');
     imagePreviewContainer.classList.add('hidden');
   });
 
-  btnSaveCard.addEventListener('click', () => {
+  // ナビゲーション: 「つぎへ」ボタン
+  btnWizardNext.addEventListener('click', () => {
+    if (currentWizardStep === 1) {
+      const textVal = inputActionPhrase.value.trim();
+      if (!textVal) {
+        alert('「うしろのことば」を にゅうりょくしてね！\n（したの「おすすめのことば」をおしても いいよ）');
+        inputActionPhrase.focus();
+        return;
+      }
+      goToWizardStep(2);
+    } else if (currentWizardStep === 2) {
+      if (mediaChoiceMode === 'photo' && !customImageDataUrl) {
+        if (!confirm('しゃしんが まだ とられていないよ。\nくまさんのポーズで つくる？')) {
+          return;
+        }
+        mediaChoiceMode = 'pose';
+      }
+      goToWizardStep(3);
+    }
+  });
+
+  // ナビゲーション: 「まえへ もどる」ボタン
+  btnWizardPrev.addEventListener('click', () => {
+    if (currentWizardStep > 1) {
+      goToWizardStep(currentWizardStep - 1);
+    }
+  });
+
+  // ナビゲーション: 「やめる」ボタン
+  btnWizardCancel.addEventListener('click', closeCreateModal);
+  btnCloseCreate.addEventListener('click', closeCreateModal);
+
+  // ナビゲーション: 「これで とうろく！」ボタン（保存完了）
+  btnWizardFinish.addEventListener('click', () => {
     const textVal = inputActionPhrase.value.trim();
     if (!textVal) {
-      alert('「うしろのことば（どうさ）」を入力してください。');
-      inputActionPhrase.focus();
+      goToWizardStep(1);
       return;
     }
 
     const newCardId = 'custom_' + Date.now();
+    const finalPhoto = (mediaChoiceMode === 'photo') ? customImageDataUrl : null;
 
     const newCard = {
       id: newCardId,
       text: textVal,
       pose: selectedNewPose,
       isDefault: false,
-      customImage: customImageDataUrl
+      customImage: finalPhoto
     };
 
     allCards.push(newCard);
@@ -1215,6 +1388,8 @@
     renderCurrentStage();
     closeCreateModal();
   });
+
+  btnCreateCard.addEventListener('click', openCreateModal);
 
   // =========================================================================
   // 9. モーダル3: つかいかた・ヒント

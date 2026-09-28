@@ -121,53 +121,144 @@
       </div>
     </div>
 
-    <!-- モーダル2: 新しい言葉をつくるモーダル -->
+    <!-- モーダル2: 新しい言葉をつくるモーダル（1画面1工程ステップ形式） -->
     <div id="modalCreateCard" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modalCreateTitle">
-      <div class="modal-window">
+      <div class="modal-window create-wizard-window">
         <div class="modal-header">
-          <h2 id="modalCreateTitle">✏️ あたらしいことばをつくろう</h2>
+          <h2 id="modalCreateTitle">✏️ あたらしいカードをつくろう</h2>
           <button class="btn-close" id="btnCloseCreate" aria-label="とじる">✕</button>
         </div>
-        <div class="modal-body">
-          <form id="createCardForm" class="create-form" onsubmit="return false;">
-            <div class="form-group">
-              <label for="inputActionPhrase">
-                <strong>うしろのことば（どうさ）</strong>
-                <span class="label-hint">※ひらがなで にゅうりょくしてね</span>
-              </label>
-              <div class="input-preview-box">
-                <span class="preview-prefix">くまさん くまさん</span>
-                <input type="text" id="inputActionPhrase" placeholder="例：て を た た い て" required maxlength="18">
-              </div>
+
+        <!-- ステップ進捗インジケーター -->
+        <div class="wizard-stepper">
+          <div class="step-indicator-item active" id="indicatorStep1">
+            <span class="step-num">1</span>
+            <span class="step-text">なまえを きめる</span>
+          </div>
+          <div class="step-indicator-line" id="indicatorLine1"></div>
+          <div class="step-indicator-item" id="indicatorStep2">
+            <span class="step-num">2</span>
+            <span class="step-text">え・しゃしん</span>
+          </div>
+          <div class="step-indicator-line" id="indicatorLine2"></div>
+          <div class="step-indicator-item" id="indicatorStep3">
+            <span class="step-num">3</span>
+            <span class="step-text">さいごの かくにん</span>
+          </div>
+        </div>
+
+        <div class="modal-body wizard-body">
+          <!-- ステップ1: なまえをきめる -->
+          <div id="createStep1" class="wizard-step active">
+            <div class="step-instruction">
+              <span class="step-badge">ステップ 1</span>
+              <h3>うしろの ことば（なまえ）を きめよう</h3>
+              <p class="step-subtext">「くまさん くまさん ○○○」の ○○○ に はいる ことばを いれてね！</p>
+            </div>
+            
+            <div class="input-preview-box large-input-box">
+              <span class="preview-prefix">くまさん くまさん</span>
+              <input type="text" id="inputActionPhrase" placeholder="例：て を た た い て" maxlength="18" autocomplete="off">
             </div>
 
-            <div class="form-group">
-              <label>
-                <strong>くまさんのポーズをえらぶ</strong>
-              </label>
+            <!-- おすすめ言葉ボタン群（ワンタップで入力可能） -->
+            <div class="suggested-phrases-box">
+              <span class="suggest-label">👇 お す す め の こ と ば（おすと はいるよ）</span>
+              <div class="suggest-buttons">
+                <button type="button" class="btn-suggest">て を た た い て</button>
+                <button type="button" class="btn-suggest">ジ ャ ン プ し て</button>
+                <button type="button" class="btn-suggest">あ た ま ポ ン ポ ン</button>
+                <button type="button" class="btn-suggest">ダ ン ス し て</button>
+                <button type="button" class="btn-suggest">わ ら っ て</button>
+                <button type="button" class="btn-suggest">ハ グ し て</button>
+                <button type="button" class="btn-suggest">あ し ぶ み し て</button>
+                <button type="button" class="btn-suggest">お や す み な さ い</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ステップ2: え・しゃしんをえらぶ -->
+          <div id="createStep2" class="wizard-step hidden">
+            <div class="step-instruction">
+              <span class="step-badge">ステップ 2</span>
+              <h3>くまさん か しゃしん を えらぼう</h3>
+              <p class="step-subtext">くまさんのポーズにするか、じぶんの写真にするか選んでね！</p>
+            </div>
+
+            <!-- 切り替えタブ -->
+            <div class="media-type-tabs">
+              <button type="button" id="tabChoosePose" class="tab-btn active">
+                <span class="tab-icon">🐻</span>
+                <span class="tab-label">くまさんの ポーズ</span>
+              </button>
+              <button type="button" id="tabChoosePhoto" class="tab-btn">
+                <span class="tab-icon">📷</span>
+                <span class="tab-label">しゃしん を とる・えらぶ</span>
+              </button>
+            </div>
+
+            <!-- くまさんポーズ選択パネル -->
+            <div id="panelChoosePose" class="media-panel active">
               <div id="poseSelector" class="pose-selector-grid">
-                <!-- ポーズ選択肢一覧 -->
+                <!-- ポーズ選択肢一覧（JSで動的生成） -->
               </div>
             </div>
 
-            <div class="form-group">
-              <label>
-                <strong>または じぶんのイラストやしゃしんをつかう</strong>
-                <span class="label-hint">（かいた絵や写真のファイルをアップロードできます）</span>
-              </label>
-              <div class="custom-image-uploader">
-                <input type="file" id="inputCustomImage" accept="image/*">
-                <div id="imagePreviewContainer" class="image-preview hidden">
-                  <img id="customImagePreview" src="" alt="プレビュー">
-                  <button type="button" id="btnRemoveImage" class="btn-danger-small">画像を消す</button>
+            <!-- 写真撮影・選択パネル -->
+            <div id="panelChoosePhoto" class="media-panel hidden">
+              <div class="photo-capture-area">
+                <input type="file" id="inputCustomImage" accept="image/*" style="display:none;">
+                
+                <div id="photoEmptyState" class="photo-empty-state">
+                  <button type="button" id="btnTriggerPhoto" class="btn-large-camera">
+                    <span class="camera-icon">📷</span>
+                    <span class="camera-text">カメラで とる / しゃしんを えらぶ</span>
+                  </button>
+                  <p class="camera-hint">※iPadやタブレットのカメラで写真をとることもできます</p>
+                </div>
+
+                <div id="imagePreviewContainer" class="photo-preview-box hidden">
+                  <div class="preview-img-wrapper">
+                    <img id="customImagePreview" src="" alt="撮影した写真">
+                  </div>
+                  <div class="preview-actions">
+                    <button type="button" id="btnRetakePhoto" class="btn-retake">📷 とりなおす</button>
+                    <button type="button" id="btnRemoveImage" class="btn-danger-small">しゃしんを けす</button>
+                  </div>
                 </div>
               </div>
             </div>
-          </form>
+          </div>
+
+          <!-- ステップ3: さいごのかくにん -->
+          <div id="createStep3" class="wizard-step hidden">
+            <div class="step-instruction">
+              <span class="step-badge">ステップ 3</span>
+              <h3>できあがり！ これで いいかな？</h3>
+              <p class="step-subtext">カードをかくにんして、よければ「とうろくする」をおしてね！</p>
+            </div>
+
+            <!-- プレビューカード表示 -->
+            <div class="final-preview-card-wrapper">
+              <div class="card-preview-display">
+                <div class="preview-card-header">
+                  <span class="preview-card-prefix">く ま さ ん  く ま さ ん</span>
+                  <h2 id="finalPreviewText" class="preview-card-action">て を た た い て</h2>
+                </div>
+                <div class="preview-card-character" id="finalPreviewCharacter">
+                  <!-- くまさんSVG または 撮影画像 -->
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" id="btnCancelCreate" class="btn-secondary-modal">キャンセル</button>
-          <button type="button" id="btnSaveCard" class="btn-primary-large">カードをとうろくする 💾</button>
+
+        <!-- ウィザード専用フッターナビゲーション -->
+        <div class="modal-footer wizard-footer">
+          <button type="button" id="btnWizardCancel" class="btn-secondary-modal">やめる</button>
+          <button type="button" id="btnWizardPrev" class="btn-secondary-modal hidden">◀ まえに もどる</button>
+          <button type="button" id="btnWizardNext" class="btn-primary-large">つぎへ すすむ ➔</button>
+          <button type="button" id="btnWizardFinish" class="btn-success-large hidden">🎉 これで とうろく！ 💾</button>
         </div>
       </div>
     </div>
